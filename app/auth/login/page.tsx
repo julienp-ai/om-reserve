@@ -32,7 +32,6 @@ export default function LoginPage() {
       return
     }
 
-    // Check account status
     const { data: profile } = await supabase
       .from('profiles')
       .select('role, status')
@@ -54,6 +53,8 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex bg-background">
+
+      {/* ── Panneau gauche desktop uniquement ── */}
       <div className="hidden lg:flex lg:w-[45%] bg-sidebar flex-col justify-between p-14">
         <div className="flex items-center gap-3">
           <Image src="/concept-erp-logo.png" alt="Concept ERP" width={38} height={38} className="object-contain" />
@@ -72,20 +73,41 @@ export default function LoginPage() {
         </p>
       </div>
 
-      <div className="flex-1 flex items-center justify-center px-6 py-12">
-        <div className="w-full max-w-sm">
-          <div className="flex items-center gap-2.5 mb-10 lg:hidden">
-            <Image src="/concept-erp-logo.png" alt="Concept ERP" width={32} height={32} className="object-contain" />
-            <span className="font-semibold text-foreground">Concept ERP</span>
-          </div>
+      {/* ── Zone principale ── */}
+      <div className="flex-1 flex flex-col lg:items-center lg:justify-center">
 
-          <div className="mb-8">
+        {/* Header mobile uniquement */}
+        <div className="lg:hidden bg-sidebar px-6 pt-12 pb-10 flex flex-col items-center gap-4">
+          <Image src="/concept-erp-logo.png" alt="Concept ERP" width={52} height={52} className="object-contain" />
+          <div className="text-center">
+            <p className="text-white font-bold text-lg tracking-tight">Concept ERP</p>
+            <p className="text-white/50 text-sm mt-0.5">Plateforme de réservation OM</p>
+          </div>
+        </div>
+
+        {/* Carte formulaire */}
+        <div className="
+          w-full lg:max-w-sm
+          bg-card
+          lg:rounded-2xl lg:shadow-sm lg:border lg:border-border
+          px-6 py-8
+          lg:px-8 lg:py-10
+          flex-1 lg:flex-none
+        ">
+          {/* Titre — caché sur mobile car visible dans le header */}
+          <div className="hidden lg:block mb-8">
             <h1 className="text-2xl font-bold text-foreground tracking-tight">Connexion</h1>
             <p className="text-sm text-muted-foreground mt-1.5">Accédez à votre espace de réservation.</p>
           </div>
 
+          {/* Titre mobile */}
+          <div className="lg:hidden mb-7">
+            <h1 className="text-xl font-bold text-foreground tracking-tight">Connexion</h1>
+            <p className="text-sm text-muted-foreground mt-1">Accédez à votre espace de réservation.</p>
+          </div>
+
           <form onSubmit={handleLogin} className="space-y-5">
-            <div className="space-y-1.5">
+            <div className="space-y-2">
               <Label htmlFor="email" className="text-sm font-medium text-foreground">Adresse email</Label>
               <Input
                 id="email"
@@ -95,13 +117,17 @@ export default function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 autoComplete="email"
-                className="h-10 bg-white border-border"
+                className="h-12 lg:h-10 bg-background border-border text-base lg:text-sm"
               />
             </div>
-            <div className="space-y-1.5">
+
+            <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="password" className="text-sm font-medium text-foreground">Mot de passe</Label>
-                <Link href="/auth/forgot-password" className="text-xs text-muted-foreground hover:text-om-blue transition-colors">
+                <Link
+                  href="/auth/forgot-password"
+                  className="text-xs text-muted-foreground hover:text-om-blue transition-colors"
+                >
                   Mot de passe oublié ?
                 </Link>
               </div>
@@ -113,7 +139,7 @@ export default function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 autoComplete="current-password"
-                className="h-10 bg-white border-border"
+                className="h-12 lg:h-10 bg-background border-border text-base lg:text-sm"
               />
             </div>
 
@@ -125,10 +151,13 @@ export default function LoginPage() {
 
             <Button
               type="submit"
-              className="w-full h-10 bg-brand-orange text-white hover:bg-brand-orange/90 font-semibold rounded-full"
+              className="w-full h-12 lg:h-10 bg-brand-orange text-white hover:bg-brand-orange/90 font-semibold rounded-full text-base lg:text-sm mt-1"
               disabled={loading}
             >
-              {loading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Connexion...</> : 'Se connecter'}
+              {loading
+                ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Connexion...</>
+                : 'Se connecter'
+              }
             </Button>
           </form>
 
@@ -139,6 +168,11 @@ export default function LoginPage() {
             </Link>
           </p>
         </div>
+
+        {/* Footer mobile */}
+        <p className="lg:hidden text-center text-xs text-muted-foreground py-6">
+          &copy; {new Date().getFullYear()} Concept ERP
+        </p>
       </div>
     </div>
   )

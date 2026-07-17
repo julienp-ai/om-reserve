@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Loader2, ArrowLeft } from 'lucide-react'
+import { Loader2, ArrowLeft, MailCheck } from 'lucide-react'
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('')
@@ -22,10 +22,7 @@ export default function ForgotPasswordPage() {
     setLoading(true)
 
     const supabase = createClient()
-
-    const siteUrl =
-      process.env.NEXT_PUBLIC_SITE_URL ||
-      window.location.origin
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin
 
     const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${siteUrl}/auth/callback?next=/auth/reset-password`,
@@ -43,6 +40,8 @@ export default function ForgotPasswordPage() {
 
   return (
     <div className="min-h-screen flex bg-background">
+
+      {/* ── Panneau gauche desktop ── */}
       <div className="hidden lg:flex lg:w-[45%] bg-sidebar flex-col justify-between p-14">
         <div className="flex items-center gap-3">
           <Image src="/concept-erp-logo.png" alt="Concept ERP" width={38} height={38} className="object-contain" />
@@ -61,30 +60,59 @@ export default function ForgotPasswordPage() {
         </p>
       </div>
 
-      <div className="flex-1 flex items-center justify-center px-6 py-12">
-        <div className="w-full max-w-sm">
-          <div className="flex items-center gap-2.5 mb-10 lg:hidden">
-            <Image src="/concept-erp-logo.png" alt="Concept ERP" width={32} height={32} className="object-contain" />
-            <span className="font-semibold text-foreground">Concept ERP</span>
-          </div>
+      {/* ── Zone principale ── */}
+      <div className="flex-1 flex flex-col lg:items-center lg:justify-center">
 
-          <div className="mb-8">
+        {/* Header mobile */}
+        <div className="lg:hidden bg-sidebar px-6 pt-12 pb-10 flex flex-col items-center gap-4">
+          <Image src="/concept-erp-logo.png" alt="Concept ERP" width={52} height={52} className="object-contain" />
+          <div className="text-center">
+            <p className="text-white font-bold text-lg tracking-tight">Concept ERP</p>
+            <p className="text-white/50 text-sm mt-0.5">Plateforme de réservation OM</p>
+          </div>
+        </div>
+
+        {/* Carte formulaire */}
+        <div className="
+          w-full lg:max-w-sm
+          bg-card
+          lg:rounded-2xl lg:shadow-sm lg:border lg:border-border
+          px-6 py-8
+          lg:px-8 lg:py-10
+          flex-1 lg:flex-none
+        ">
+          {/* Titre desktop */}
+          <div className="hidden lg:block mb-8">
             <h1 className="text-2xl font-bold text-foreground tracking-tight">Mot de passe oublié</h1>
             <p className="text-sm text-muted-foreground mt-1.5">
-              Saisissez votre adresse email pour recevoir un lien de réinitialisation.
+              Saisissez votre email pour recevoir un lien de réinitialisation.
+            </p>
+          </div>
+
+          {/* Titre mobile */}
+          <div className="lg:hidden mb-7">
+            <h1 className="text-xl font-bold text-foreground tracking-tight">Mot de passe oublié</h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              Saisissez votre email pour recevoir un lien de réinitialisation.
             </p>
           </div>
 
           {sent ? (
-            <div className="space-y-5">
-              <Alert>
-                <AlertDescription className="text-sm">
-                  Un email de réinitialisation a été envoyé à <strong>{email}</strong>. Vérifiez votre boîte de réception et cliquez sur le lien.
-                </AlertDescription>
-              </Alert>
+            <div className="space-y-6">
+              <div className="flex flex-col items-center gap-4 py-4">
+                <div className="w-14 h-14 rounded-full bg-brand-orange/10 flex items-center justify-center">
+                  <MailCheck className="w-7 h-7 text-brand-orange" />
+                </div>
+                <div className="text-center space-y-1">
+                  <p className="font-semibold text-foreground">Email envoyé !</p>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Vérifiez votre boîte de réception à <strong className="text-foreground">{email}</strong> et cliquez sur le lien.
+                  </p>
+                </div>
+              </div>
               <Link
                 href="/auth/login"
-                className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                className="flex items-center justify-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 <ArrowLeft className="h-4 w-4" />
                 Retour à la connexion
@@ -92,7 +120,7 @@ export default function ForgotPasswordPage() {
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-5">
-              <div className="space-y-1.5">
+              <div className="space-y-2">
                 <Label htmlFor="email" className="text-sm font-medium text-foreground">Adresse email</Label>
                 <Input
                   id="email"
@@ -102,7 +130,7 @@ export default function ForgotPasswordPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   autoComplete="email"
-                  className="h-10 bg-white border-border"
+                  className="h-12 lg:h-10 bg-background border-border text-base lg:text-sm"
                 />
               </div>
 
@@ -114,10 +142,13 @@ export default function ForgotPasswordPage() {
 
               <Button
                 type="submit"
-                className="w-full h-10 bg-brand-orange text-white hover:bg-brand-orange/90 font-semibold rounded-full"
+                className="w-full h-12 lg:h-10 bg-brand-orange text-white hover:bg-brand-orange/90 font-semibold rounded-full text-base lg:text-sm mt-1"
                 disabled={loading}
               >
-                {loading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Envoi en cours...</> : 'Envoyer le lien'}
+                {loading
+                  ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Envoi en cours...</>
+                  : 'Envoyer le lien'
+                }
               </Button>
 
               <Link
@@ -130,6 +161,10 @@ export default function ForgotPasswordPage() {
             </form>
           )}
         </div>
+
+        <p className="lg:hidden text-center text-xs text-muted-foreground py-6">
+          &copy; {new Date().getFullYear()} Concept ERP
+        </p>
       </div>
     </div>
   )
