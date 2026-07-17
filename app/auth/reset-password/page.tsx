@@ -2,54 +2,47 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
-import { createClient } from '@/lib/supabase/client'
 import Image from 'next/image'
+import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Loader2 } from 'lucide-react'
 
-export default function LoginPage() {
+export default function ResetPasswordPage() {
   const router = useRouter()
-  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState<string | null>(null)
+  const [confirm, setConfirm] = useState('')
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  async function handleLogin(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError(null)
+
+    if (password.length < 8) {
+      setError('Le mot de passe doit contenir au moins 8 caractères.')
+      return
+    }
+
+    if (password !== confirm) {
+      setError('Les mots de passe ne correspondent pas.')
+      return
+    }
+
     setLoading(true)
-
     const supabase = createClient()
-    const { data, error: authError } = await supabase.auth.signInWithPassword({ email, password })
 
-    if (authError) {
-      setError('Email ou mot de passe incorrect.')
+    const { error: updateError } = await supabase.auth.updateUser({ password })
+
+    if (updateError) {
+      setError("Une erreur est survenue. Le lien a peut-être expiré, veuillez recommencer.")
       setLoading(false)
       return
     }
 
-    // Check account status
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role, status')
-      .eq('id', data.user.id)
-      .single()
-
-    if (profile?.status === 'pending') {
-      router.push('/auth/pending')
-    } else if (profile?.status === 'rejected') {
-      await supabase.auth.signOut()
-      setError("Votre demande d'accès a été refusée. Contactez un administrateur.")
-      setLoading(false)
-    } else if (profile?.role === 'admin') {
-      router.push('/admin')
-    } else {
-      router.push('/dashboard')
-    }
+    router.push('/dashboard')
   }
 
   return (
@@ -80,39 +73,36 @@ export default function LoginPage() {
           </div>
 
           <div className="mb-8">
-            <h1 className="text-2xl font-bold text-foreground tracking-tight">Connexion</h1>
-            <p className="text-sm text-muted-foreground mt-1.5">Accédez à votre espace de réservation.</p>
+            <h1 className="text-2xl font-bold text-foreground tracking-tight">Nouveau mot de passe</h1>
+            <p className="text-sm text-muted-foreground mt-1.5">
+              Choisissez un nouveau mot de passe pour votre compte.
+            </p>
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-1.5">
-              <Label htmlFor="email" className="text-sm font-medium text-foreground">Adresse email</Label>
+              <Label htmlFor="password" className="text-sm font-medium text-foreground">Nouveau mot de passe</Label>
               <Input
-                id="email"
-                type="email"
-                placeholder="prenom.nom@concept-erp.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                id="password"
+                type="password"
+                placeholder="Minimum 8 caractères"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 required
-                autoComplete="email"
+                autoComplete="new-password"
                 className="h-10 bg-white border-border"
               />
             </div>
             <div className="space-y-1.5">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password" className="text-sm font-medium text-foreground">Mot de passe</Label>
-                <Link href="/auth/forgot-password" className="text-xs text-muted-foreground hover:text-om-blue transition-colors">
-                  Mot de passe oublié ?
-                </Link>
-              </div>
+              <Label htmlFor="confirm" className="text-sm font-medium text-foreground">Confirmer le mot de passe</Label>
               <Input
-                id="password"
+                id="confirm"
                 type="password"
                 placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                value={confirm}
+                onChange={(e) => setConfirm(e.target.value)}
                 required
-                autoComplete="current-password"
+                autoComplete="new-password"
                 className="h-10 bg-white border-border"
               />
             </div>
@@ -128,16 +118,9 @@ export default function LoginPage() {
               className="w-full h-10 bg-brand-orange text-white hover:bg-brand-orange/90 font-semibold rounded-full"
               disabled={loading}
             >
-              {loading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Connexion...</> : 'Se connecter'}
+              {loading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Enregistrement...</> : 'Enregistrer le mot de passe'}
             </Button>
           </form>
-
-          <p className="text-center text-sm text-muted-foreground mt-7">
-            Pas encore de compte ?{' '}
-            <Link href="/auth/signup" className="text-om-blue hover:underline font-medium">
-              Faire une demande
-            </Link>
-          </p>
         </div>
       </div>
     </div>
