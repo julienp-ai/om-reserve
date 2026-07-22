@@ -48,7 +48,7 @@ export function PresenceList({ basePath }: { basePath: 'dashboard' | 'admin' }) 
 
   return (
     <div className="px-3 py-3 border-t border-sidebar-border">
-      <p className="text-white/30 text-[10px] font-semibold uppercase tracking-wider mb-2 px-1">
+      <p className="text-sidebar-foreground/40 text-[10px] font-semibold uppercase tracking-wider mb-2 px-1">
         Équipe — {online.length} en ligne
       </p>
       <div className="space-y-0.5 max-h-48 overflow-y-auto">
@@ -68,11 +68,11 @@ export function PresenceList({ basePath }: { basePath: 'dashboard' | 'admin' }) 
               <span
                 className={cn(
                   'absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full border border-sidebar',
-                  u.online ? 'bg-green-400' : 'bg-white/20',
+                  u.online ? 'bg-green-400' : 'bg-sidebar-foreground/20',
                 )}
               />
             </div>
-            <span className={cn('text-xs truncate', u.online ? 'text-white/80' : 'text-white/35')}>
+            <span className={cn('text-xs truncate', u.online ? 'text-sidebar-foreground' : 'text-sidebar-foreground/40')}>
               {u.full_name}
             </span>
           </Link>
