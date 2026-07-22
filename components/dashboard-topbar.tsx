@@ -54,7 +54,7 @@ export function DashboardTopbar({ profile }: { profile: Profile }) {
   const profilHref = pathname.startsWith('/admin') ? '/admin/profil' : '/dashboard/profil'
 
   return (
-    <header className="h-14 shrink-0 flex items-center justify-end px-5 border-b border-border bg-card gap-2">
+    <header className="h-14 shrink-0 flex items-center justify-end px-5 border-b border-sidebar-border bg-sidebar gap-2">
       <NotificationBell userId={profile.id} />
 
       <Link
@@ -70,7 +70,7 @@ export function DashboardTopbar({ profile }: { profile: Profile }) {
           </AvatarFallback>
         </Avatar>
         <div className="hidden sm:block leading-tight">
-          <p className="text-sm font-medium text-foreground">{profile.full_name}</p>
+          <p className="text-sm font-semibold text-sidebar-foreground">{profile.full_name}</p>
         </div>
       </Link>
 
@@ -78,7 +78,7 @@ export function DashboardTopbar({ profile }: { profile: Profile }) {
         variant="ghost"
         size="icon"
         onClick={handleSignOut}
-        className="h-8 w-8 text-muted-foreground hover:text-foreground"
+        className="h-8 w-8 text-sidebar-foreground/50 hover:text-sidebar-foreground"
         title="Se déconnecter"
       >
         <LogOut className="w-4 h-4" />

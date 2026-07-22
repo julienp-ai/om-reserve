@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils'
 import { PresenceList } from '@/components/presence-list'
 
 const navItems = [
-  { href: '/admin', label: 'Vue d\'ensemble', icon: LayoutDashboard, exact: true },
+  { href: '/admin', label: "Vue d'ensemble", icon: LayoutDashboard, exact: true },
   { href: '/admin/accounts', label: 'Comptes', icon: Users, exact: false },
   { href: '/admin/reservations', label: 'Réservations', icon: Ticket, exact: false },
   { href: '/admin/matches', label: 'Matchs', icon: Calendar, exact: false },
@@ -25,14 +25,16 @@ export function AdminSidebar() {
 
   return (
     <aside className="w-56 shrink-0 flex flex-col bg-sidebar h-full border-r border-sidebar-border">
+      {/* Header logo */}
       <div className="flex items-center gap-2.5 px-4 h-14 border-b border-sidebar-border">
         <Image src="/concept-erp-logo.png" alt="Concept ERP" width={28} height={28} className="object-contain" />
         <div>
-          <p className="text-white font-semibold text-sm leading-none">Administration</p>
-          <p className="text-white/40 text-[11px] mt-0.5">Concept ERP</p>
+          <p className="text-sidebar-foreground font-bold text-sm leading-none">Administration</p>
+          <p className="text-sidebar-foreground/50 text-[11px] mt-0.5">Concept ERP</p>
         </div>
       </div>
 
+      {/* Navigation */}
       <nav className="flex-1 px-2 py-3" aria-label="Navigation administration">
         {navItems.map(({ href, label, icon: Icon, exact }) => {
           const active = isActive(href, exact)
@@ -41,13 +43,13 @@ export function AdminSidebar() {
               key={href}
               href={href}
               className={cn(
-                'flex items-center gap-2.5 px-3 py-2 rounded-md text-sm transition-colors mb-0.5',
+                'flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm transition-colors mb-0.5',
                 active
-                  ? 'bg-sidebar-accent text-white font-medium'
-                  : 'text-white/55 hover:bg-sidebar-accent/50 hover:text-white',
+                  ? 'bg-[#FF4F00] text-white font-semibold shadow-sm'
+                  : 'text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground',
               )}
             >
-              <Icon className={cn('w-4 h-4 shrink-0', active ? 'text-brand-orange' : 'text-white/40')} />
+              <Icon className={cn('w-4 h-4 shrink-0', active ? 'text-white' : 'text-sidebar-foreground/40')} />
               {label}
             </Link>
           )
@@ -55,8 +57,9 @@ export function AdminSidebar() {
       </nav>
 
       <PresenceList basePath="admin" />
+
       <div className="px-4 py-3 border-t border-sidebar-border">
-        <p className="text-white/25 text-[11px]">
+        <p className="text-sidebar-foreground/30 text-[11px]">
           © {new Date().getFullYear()} Concept ERP
         </p>
       </div>
