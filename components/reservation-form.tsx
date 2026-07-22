@@ -6,7 +6,7 @@ import type { Reservation } from '@/lib/types'
 import { createReservation, cancelReservation } from '@/lib/actions'
 import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Loader2, Minus, Plus } from 'lucide-react'
+import { Loader2, Minus, Plus, CheckCircle2 } from 'lucide-react'
 
 interface ReservationFormProps {
   matchId: string
@@ -31,7 +31,7 @@ export function ReservationForm({ matchId, userId, mode, existingReservation, au
     if (result.error) {
       setError(result.error)
     } else {
-      setSuccess(autoApprove ? 'Réservation confirmée directement.' : 'Votre demande de réservation a été envoyée avec succès.')
+      setSuccess(autoApprove ? 'Réservation confirmée !' : 'Votre demande a bien été envoyée.')
       router.refresh()
     }
   }
@@ -52,9 +52,13 @@ export function ReservationForm({ matchId, userId, mode, existingReservation, au
 
   if (success) {
     return (
-      <Alert className="border-green-500/30 bg-green-500/5">
-        <AlertDescription className="text-green-700 dark:text-green-400">{success}</AlertDescription>
-      </Alert>
+      <div className="flex flex-col items-center gap-3 py-6 text-center">
+        <CheckCircle2 className="w-12 h-12 text-green-500" />
+        <p className="text-[#0D3B5E] font-semibold text-base">{success}</p>
+        {!autoApprove && (
+          <p className="text-sm text-gray-500">Un administrateur va valider votre demande.</p>
+        )}
+      </div>
     )
   }
 
@@ -68,45 +72,49 @@ export function ReservationForm({ matchId, userId, mode, existingReservation, au
         )}
         <Button
           variant="outline"
-          className="border-destructive/40 text-destructive hover:bg-destructive/5"
+          className="w-full h-12 border-red-300 text-red-600 hover:bg-red-50 rounded-xl text-base"
           onClick={handleCancel}
           disabled={loading}
         >
-          {loading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Annulation...</> : 'Annuler ma demande'}
+          {loading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Annulation...</> : 'Annuler ma réservation'}
         </Button>
       </div>
     )
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
+      {/* Selecteur de places */}
       <div>
-        <label className="text-sm font-medium text-foreground mb-2 block">
-          Nombre de places (max. 4)
-        </label>
-        <div className="flex items-center gap-3">
-          <Button
-            variant="outline"
-            size="icon"
+        <p className="text-sm font-semibold text-[#0D3B5E] mb-3">
+          Nombre de places <span className="font-normal text-gray-400">(max. 4)</span>
+        </p>
+
+        <div className="flex items-center justify-center gap-6 bg-gray-50 rounded-2xl p-4">
+          <button
+            type="button"
             onClick={() => setSeats((s) => Math.max(1, s - 1))}
             disabled={seats <= 1}
-            type="button"
+            className="w-11 h-11 rounded-full border-2 border-gray-200 flex items-center justify-center text-[#0D3B5E] disabled:opacity-30 hover:border-[#FF4F00] hover:text-[#FF4F00] transition-colors active:scale-95"
+            aria-label="Diminuer"
           >
-            <Minus className="w-4 h-4" />
-          </Button>
-          <span className="text-xl font-bold text-foreground w-8 text-center">{seats}</span>
-          <Button
-            variant="outline"
-            size="icon"
+            <Minus className="w-5 h-5" />
+          </button>
+
+          <div className="text-center min-w-[60px]">
+            <span className="text-4xl font-bold text-[#0D3B5E]">{seats}</span>
+            <p className="text-xs text-gray-400 mt-0.5">place{seats > 1 ? 's' : ''}</p>
+          </div>
+
+          <button
+            type="button"
             onClick={() => setSeats((s) => Math.min(4, s + 1))}
             disabled={seats >= 4}
-            type="button"
+            className="w-11 h-11 rounded-full border-2 border-gray-200 flex items-center justify-center text-[#0D3B5E] disabled:opacity-30 hover:border-[#FF4F00] hover:text-[#FF4F00] transition-colors active:scale-95"
+            aria-label="Augmenter"
           >
-            <Plus className="w-4 h-4" />
-          </Button>
-          <span className="text-sm text-muted-foreground ml-1">
-            place{seats > 1 ? 's' : ''}
-          </span>
+            <Plus className="w-5 h-5" />
+          </button>
         </div>
       </div>
 
@@ -119,17 +127,17 @@ export function ReservationForm({ matchId, userId, mode, existingReservation, au
       <Button
         onClick={handleCreate}
         disabled={loading}
-        className="bg-om-blue text-om-blue-foreground hover:bg-om-blue/90"
+        className="w-full h-13 bg-[#FF4F00] hover:bg-[#e04500] text-white font-bold rounded-xl text-base"
       >
         {loading ? (
-          <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Réservation...</>
+          <><Loader2 className="mr-2 h-5 w-5 animate-spin" />Réservation en cours...</>
         ) : (
           `Réserver ${seats} place${seats > 1 ? 's' : ''}`
         )}
       </Button>
 
       {!autoApprove && (
-        <p className="text-xs text-muted-foreground">
+        <p className="text-xs text-center text-gray-400">
           Votre demande sera validée par un administrateur.
         </p>
       )}
