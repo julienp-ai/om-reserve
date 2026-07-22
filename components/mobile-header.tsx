@@ -77,7 +77,7 @@ export function MobileHeader({ profile }: { profile: Profile }) {
       style={{ paddingTop: 'env(safe-area-inset-top)' }}
     >
       {/* Logo */}
-      <Image src="/concept-erp-logo.png" alt="Concept ERP" width={28} height={28} className="object-contain shrink-0" />
+      <Image src="/concept-erp-logo.png" alt="Concept ERP" width={44} height={44} className="object-contain shrink-0" />
 
       {/* Title */}
       <span className="ml-3 text-[#0D3B5E] font-bold text-base flex-1 truncate">{title}</span>
