@@ -8,8 +8,6 @@ import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Loader2, ArrowLeft, MailCheck } from 'lucide-react'
 import { AuthShell } from '@/components/auth/auth-shell'
-import { requestPasswordReset } from '@/lib/actions'
-
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
@@ -21,10 +19,20 @@ export default function ForgotPasswordPage() {
     setError(null)
     setLoading(true)
 
-    const { error: actionError } = await requestPasswordReset(email)
-
-    if (actionError) {
-      setError(actionError)
+    try {
+      const res = await fetch('/api/password-reset-request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      })
+      const data = await res.json()
+      if (!res.ok || data.error) {
+        setError(data.error || 'Erreur lors de la soumission de la demande.')
+        setLoading(false)
+        return
+      }
+    } catch {
+      setError('Erreur réseau. Veuillez réessayer.')
       setLoading(false)
       return
     }
