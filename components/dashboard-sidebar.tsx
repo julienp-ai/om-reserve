@@ -26,7 +26,7 @@ export function DashboardSidebar() {
     <aside className="w-56 shrink-0 flex flex-col bg-sidebar h-full border-r border-sidebar-border">
       {/* Header logo */}
       <div className="flex items-center gap-2.5 px-4 h-14 border-b border-sidebar-border">
-        <Image src="/concept-erp-logo.png" alt="Concept ERP" width={28} height={28} className="object-contain" />
+        <Image src="/concept-erp-logo.png" alt="Concept ERP" width={56} height={56} className="object-contain" />
         <div>
           <p className="text-sidebar-foreground font-bold text-sm leading-none">Concept ERP</p>
           <p className="text-sidebar-foreground/50 text-[11px] mt-0.5">Réservation OM</p>

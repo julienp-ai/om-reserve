@@ -2,13 +2,13 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Loader2, ArrowLeft, MailCheck } from 'lucide-react'
 import { AuthShell } from '@/components/auth/auth-shell'
+import { requestPasswordReset } from '@/lib/actions'
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('')
@@ -21,15 +21,10 @@ export default function ForgotPasswordPage() {
     setError(null)
     setLoading(true)
 
-    const supabase = createClient()
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin
+    const { error: actionError } = await requestPasswordReset(email)
 
-    const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${siteUrl}/auth/callback?next=/auth/reset-password`,
-    })
-
-    if (resetError) {
-      setError("Une erreur est survenue. Veuillez réessayer.")
+    if (actionError) {
+      setError(actionError)
       setLoading(false)
       return
     }
@@ -42,20 +37,17 @@ export default function ForgotPasswordPage() {
     return (
       <AuthShell>
         <div className="flex flex-col items-center text-center py-6 space-y-6">
-          {/* Icone */}
           <div className="w-20 h-20 rounded-full bg-[#FF4F00]/10 flex items-center justify-center">
             <MailCheck className="w-10 h-10 text-[#FF4F00]" />
           </div>
 
-          {/* Texte */}
           <div className="space-y-3">
-            <h1 className="text-[#0D3B5E] text-2xl font-bold tracking-tight">Email envoyé !</h1>
+            <h1 className="text-[#0D3B5E] text-2xl font-bold tracking-tight">Demande envoyée !</h1>
             <p className="text-gray-500 text-base leading-relaxed">
-              Un lien de réinitialisation a été envoyé à{' '}
-              <span className="font-semibold text-[#0D3B5E]">{email}</span>.
+              Votre demande de réinitialisation a bien été transmise aux administrateurs.
             </p>
             <p className="text-sm text-gray-400">
-              Pensez à vérifier vos spams si vous ne le recevez pas sous quelques minutes.
+              Un administrateur va réinitialiser votre mot de passe et vous en informera sous peu.
             </p>
           </div>
 
@@ -73,7 +65,6 @@ export default function ForgotPasswordPage() {
 
   return (
     <AuthShell>
-      {/* Retour */}
       <Link
         href="/auth/login"
         className="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-[#0D3B5E] transition-colors mb-7"
@@ -82,14 +73,13 @@ export default function ForgotPasswordPage() {
         Retour à la connexion
       </Link>
 
-      {/* Titre */}
       <div className="mb-8">
         <div className="w-10 h-[3px] bg-[#FF4F00] rounded-full mb-5" />
         <h1 className="text-[#0D3B5E] text-3xl font-bold tracking-tight leading-tight">
           Mot de passe oublié
         </h1>
         <p className="text-gray-500 mt-2 text-base leading-relaxed">
-          Saisissez votre adresse email pour recevoir un lien de réinitialisation.
+          Saisissez votre adresse email. Un administrateur réinitialisera votre mot de passe.
         </p>
       </div>
 
@@ -123,7 +113,7 @@ export default function ForgotPasswordPage() {
         >
           {loading
             ? <><Loader2 className="mr-2 h-5 w-5 animate-spin" />Envoi en cours...</>
-            : 'Envoyer le lien'
+            : 'Envoyer la demande'
           }
         </Button>
       </form>

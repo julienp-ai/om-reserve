@@ -16,8 +16,8 @@ export function AuthShell({ children }: AuthShellProps) {
           <Image
             src="/concept-erp-logo.png"
             alt="Concept ERP"
-            width={40}
-            height={40}
+            width={72}
+            height={72}
             className="object-contain"
           />
           <div className="flex flex-col leading-none">

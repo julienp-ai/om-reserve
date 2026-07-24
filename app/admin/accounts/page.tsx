@@ -1,9 +1,10 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import type { Profile, AccountStatus } from '@/lib/types'
+import type { Profile, AccountStatus, PasswordResetRequest } from '@/lib/types'
 import { AdminAccountActions } from '@/components/admin-account-actions'
+import { AdminResetRequestActions } from '@/components/admin-reset-request-actions'
 import { Badge } from '@/components/ui/badge'
-import { Users, Clock } from 'lucide-react'
+import { Users, Clock, KeyRound } from 'lucide-react'
 import { formatShortDate } from '@/lib/format'
 
 const statusConfig: Record<AccountStatus, { label: string; className: string }> = {
@@ -17,14 +18,22 @@ export default async function AdminAccountsPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
 
-  const { data: profiles } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('role', 'collaborator')
-    .order('created_at', { ascending: false })
+  const [{ data: profiles }, { data: resetRequests }] = await Promise.all([
+    supabase
+      .from('profiles')
+      .select('*')
+      .eq('role', 'collaborator')
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('password_reset_requests')
+      .select('*, profile:profiles(id, full_name, department)')
+      .eq('status', 'pending')
+      .order('created_at', { ascending: false }),
+  ])
 
   const pending = (profiles ?? []).filter((p) => p.status === 'pending')
   const others = (profiles ?? []).filter((p) => p.status !== 'pending')
+  const pendingResets = (resetRequests ?? []) as PasswordResetRequest[]
 
   return (
     <div className="max-w-4xl space-y-6">
@@ -34,9 +43,48 @@ export default async function AdminAccountsPage() {
           Gestion des comptes
         </h1>
         <p className="text-muted-foreground mt-1">
-          Validez ou refusez les demandes d&apos;accès des collaborateurs.
+          Validez les demandes d&apos;accès et réinitialisez les mots de passe.
         </p>
       </div>
+
+      {/* Demandes de reset de mot de passe */}
+      {pendingResets.length > 0 && (
+        <section>
+          <div className="flex items-center gap-2 mb-3">
+            <KeyRound className="w-4 h-4 text-[#FF4F00]" />
+            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+              Demandes de mot de passe oublié ({pendingResets.length})
+            </h2>
+          </div>
+          <div className="rounded-xl border border-[#FF4F00]/30 bg-card overflow-hidden">
+            {pendingResets.map((req, idx) => (
+              <div
+                key={req.id}
+                className={`flex items-center justify-between px-5 py-4 gap-4 ${idx !== pendingResets.length - 1 ? 'border-b border-border' : ''}`}
+              >
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-foreground">{req.profile?.full_name ?? req.email}</p>
+                  <p className="text-xs text-muted-foreground">{req.email}</p>
+                  <p className="text-xs text-muted-foreground/70 mt-0.5">
+                    Demande le {formatShortDate(req.created_at)}
+                  </p>
+                </div>
+                <div className="flex items-center gap-3 shrink-0">
+                  <Badge variant="outline" className="bg-[#FF4F00]/10 text-[#FF4F00] border-[#FF4F00]/20 text-xs">
+                    En attente
+                  </Badge>
+                  <AdminResetRequestActions
+                    requestId={req.id}
+                    profileId={req.user_id ?? ''}
+                    profileName={req.profile?.full_name ?? req.email}
+                    currentAdminId={user.id}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Pending accounts */}
       {pending.length > 0 && (
