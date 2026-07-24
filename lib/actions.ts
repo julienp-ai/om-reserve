@@ -396,3 +396,89 @@ export async function deleteMatch(matchId: string): Promise<{ error?: string }> 
   revalidatePath('/dashboard/matches')
   return {}
 }
+
+// ============================================================
+// PASSWORD RESET REQUESTS
+// ============================================================
+
+export async function requestPasswordReset(email: string): Promise<{ error?: string }> {
+  // Utilise le service role pour chercher l'utilisateur sans session
+  const { createClient: createSbAdmin } = await import('@supabase/supabase-js')
+  const adminSb = createSbAdmin(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  )
+
+  // Verifie que l'email existe dans les profiles
+  const { data: profile } = await adminSb
+    .from('profiles')
+    .select('id, full_name')
+    .eq('email', email.toLowerCase().trim())
+    .single()
+
+  if (!profile) {
+    // On ne revele pas si l'email existe ou non (securite)
+    return {}
+  }
+
+  // Verifie si une demande pending existe deja pour eviter le spam
+  const { data: existing } = await adminSb
+    .from('password_reset_requests')
+    .select('id')
+    .eq('email', email.toLowerCase().trim())
+    .eq('status', 'pending')
+    .single()
+
+  if (existing) {
+    // Demande deja en cours, on ne cree pas un doublon
+    return {}
+  }
+
+  const { error } = await adminSb.from('password_reset_requests').insert({
+    email: email.toLowerCase().trim(),
+    user_id: profile.id,
+  })
+
+  if (error) return { error: 'Erreur lors de la soumission de la demande.' }
+
+  // Notifier tous les admins
+  const { data: admins } = await adminSb
+    .from('profiles')
+    .select('id')
+    .eq('role', 'admin')
+
+  if (admins && admins.length > 0) {
+    await adminSb.from('notifications').insert(
+      admins.map((admin) => ({
+        user_id: admin.id,
+        title: 'Demande de reinitialisation de mot de passe',
+        message: `${profile.full_name} (${email}) demande la reinitialisation de son mot de passe.`,
+        type: 'new_account',
+      })),
+    )
+  }
+
+  revalidatePath('/admin/accounts')
+  return {}
+}
+
+export async function resolvePasswordResetRequest(
+  requestId: string,
+  resolvedById: string,
+): Promise<{ error?: string }> {
+  const supabase = await createClient()
+
+  const { error } = await supabase
+    .from('password_reset_requests')
+    .update({
+      status: 'done',
+      resolved_at: new Date().toISOString(),
+      resolved_by: resolvedById,
+    })
+    .eq('id', requestId)
+
+  if (error) return { error: 'Erreur lors de la mise a jour de la demande.' }
+
+  revalidatePath('/admin/accounts')
+  return {}
+}

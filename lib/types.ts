@@ -73,3 +73,17 @@ export interface Notification {
   related_id: string | null
   created_at: string
 }
+
+export type PasswordResetStatus = 'pending' | 'done'
+
+export interface PasswordResetRequest {
+  id: string
+  email: string
+  user_id: string | null
+  status: PasswordResetStatus
+  created_at: string
+  resolved_at: string | null
+  resolved_by: string | null
+  // Joined
+  profile?: Pick<Profile, 'id' | 'full_name' | 'department'>
+}
