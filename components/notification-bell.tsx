@@ -97,13 +97,13 @@ export function NotificationBell({ userId }: { userId: string }) {
       </Button>
 
       {open && (
-        <div className="absolute right-0 top-10 z-50 w-80 rounded-xl border border-border bg-popover shadow-xl">
+        <div className="absolute right-0 top-10 z-50 w-80 rounded-xl border border-[#0D3B5E]/15 bg-white shadow-2xl ring-1 ring-black/5">
           <div className="flex items-center justify-between px-4 py-3">
-            <span className="font-semibold text-sm text-foreground">Notifications</span>
+            <span className="font-semibold text-sm text-[#0D3B5E]">Notifications</span>
             {unread > 0 && (
               <button
                 onClick={markAllRead}
-                className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                className="text-xs text-[#0D3B5E]/50 hover:text-[#0D3B5E] transition-colors"
               >
                 Tout marquer comme lu
               </button>
@@ -112,7 +112,7 @@ export function NotificationBell({ userId }: { userId: string }) {
           <Separator />
           <div className="max-h-80 overflow-y-auto">
             {notifications.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-8">
+              <p className="text-sm text-[#0D3B5E]/50 text-center py-8">
                 Aucune notification
               </p>
             ) : (
@@ -120,22 +120,22 @@ export function NotificationBell({ userId }: { userId: string }) {
                 <button
                   key={n.id}
                   onClick={() => markOneRead(n.id)}
-                  className={`w-full text-left px-4 py-3 hover:bg-muted/50 transition-colors border-b border-border/50 last:border-0 ${
-                    !n.read ? 'bg-om-blue/5' : ''
+                  className={`w-full text-left px-4 py-3 hover:bg-[#0D3B5E]/5 transition-colors border-b border-[#0D3B5E]/8 last:border-0 ${
+                    !n.read ? 'bg-[#FF4F00]/5' : ''
                   }`}
                 >
                   <div className="flex items-start gap-2">
                     {!n.read && (
-                      <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-brand-orange" />
+                      <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[#FF4F00]" />
                     )}
                     <div className={!n.read ? '' : 'pl-4'}>
-                      <p className="text-sm font-medium text-foreground leading-snug">
+                      <p className="text-sm font-medium text-[#0D3B5E] leading-snug">
                         {n.title}
                       </p>
-                      <p className="text-xs text-muted-foreground mt-0.5 leading-snug">
+                      <p className="text-xs text-[#0D3B5E]/60 mt-0.5 leading-snug">
                         {n.message}
                       </p>
-                      <p className="text-[10px] text-muted-foreground/70 mt-1">
+                      <p className="text-[10px] text-[#0D3B5E]/40 mt-1">
                         {formatDistanceToNow(new Date(n.created_at), { locale: fr, addSuffix: true })}
                       </p>
                     </div>
