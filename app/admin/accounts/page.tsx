@@ -26,7 +26,7 @@ export default async function AdminAccountsPage() {
       .order('created_at', { ascending: false }),
     supabase
       .from('password_reset_requests')
-      .select('*, profile:profiles(id, full_name, department)')
+      .select('*, profile:profiles!password_reset_requests_user_id_fkey(id, full_name, department)')
       .eq('status', 'pending')
       .order('created_at', { ascending: false }),
   ])
